@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bierdeckel — meine Strichliste</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- =====================================================================
+     HIER TRÄGST DU NEUE BIERE EIN.
+     Ein Bier = ein Objekt. Neues Bier einfach unten anhängen.
+
+     datum       "JJJJ-MM-TT"
+     bewertung   Zahl 1–10, oder null wenn noch nicht bewertet
+     alkoholfrei true / false
+     Ein "?" hinter einem Wert heißt: noch nicht am Etikett geprüft.
+     Feld leer lassen mit ""  ->  auf der Karte erscheint dann "—"
+     ===================================================================== -->
+<script>
+const BIERE = [
+  { datum:"2026-07-11", name:"Hell", brauerei:"Flötzinger Bräu", ort:"Rosenheim",
+    stil:"Helles", alkohol:"4,9 % ?", stammwuerze:"", ibu:"", farbe:"Goldgelb",
+    alkoholfrei:false, bewertung:null, notiz:"" },
+
+  { datum:"2026-07-18", name:"1543 Hefe-Weisse kellertrüb", brauerei:"Flötzinger Bräu", ort:"Rosenheim",
+    stil:"Hefeweizen, hell", alkohol:"5,4 % ?", stammwuerze:"", ibu:"", farbe:"Bernstein, trüb",
+    alkoholfrei:false, bewertung:null, notiz:"" },
+
+  { datum:"2026-07-19", name:"Hell", brauerei:"Herzogliches Brauhaus Tegernsee", ort:"Tegernsee",
+    stil:"Helles", alkohol:"4,8 %", stammwuerze:"11,7 % ?", ibu:"", farbe:"Hellgold",
+    alkoholfrei:false, bewertung:null, notiz:"" },
+
+  { datum:"2026-07-20", name:"Alkoholfrei Hell", brauerei:"Augustiner-Bräu", ort:"München",
+    stil:"Helles, alkoholfrei", alkohol:"< 0,5 %", stammwuerze:"", ibu:"", farbe:"Hellgold",
+    alkoholfrei:true, bewertung:null, notiz:"" },
+
+  { datum:"2026-07-24", name:"Kleiner Mönch", brauerei:"Alpirsbacher Klosterbräu", ort:"Alpirsbach",
+    stil:"Spezial / Vollbier", alkohol:"5,2 % ?", stammwuerze:"", ibu:"", farbe:"Goldgelb",
+    alkoholfrei:false, bewertung:null, notiz:"" },
+
+  { datum:"2026-07-26", name:"Spezial", brauerei:"Herzogliches Brauhaus Tegernsee", ort:"Tegernsee",
+    stil:"Export / Spezial", alkohol:"5,6 %", stammwuerze:"", ibu:"", farbe:"Kräftiges Gold",
+    alkoholfrei:false, bewertung:null, notiz:"" },
+
+  { datum:"2026-07-27", name:"Hell Alkoholfrei", brauerei:"Herzogliches Brauhaus Tegernsee", ort:"Tegernsee",
+    stil:"Helles, alkoholfrei", alkohol:"< 0,5 %", stammwuerze:"", ibu:"", farbe:"Hellgold",
+    alkoholfrei:true, bewertung:null, notiz:"" },
+
+  { datum:"2026-07-28", name:"Alkoholfrei Hell", brauerei:"Flötzinger Bräu", ort:"Rosenheim",
+    stil:"Helles, alkoholfrei", alkohol:"< 0,5 %", stammwuerze:"", ibu:"", farbe:"Hellgold",
+    alkoholfrei:true, bewertung:null, notiz:"" },
+
+  { datum:"2026-07-30", name:"Lagerbier Hell", brauerei:"Augustiner-Bräu", ort:"München",
+    stil:"Helles", alkohol:"5,2 %", stammwuerze:"11,8 % ?", ibu:"", farbe:"Hellgold",
+    alkoholfrei:false, bewertung:null, notiz:"" },
+
+  { datum:"2026-07-31", name:"0,0 % Herb", brauerei:"Bitburger", ort:"Bitburg",
+    stil:"Pils, alkoholfrei", alkohol:"0,0 %", stammwuerze:"", ibu:"", farbe:"Blassgold",
+    alkoholfrei:true, bewertung:null, notiz:"" },
+
+  { datum:"2026-07-31", name:"Bräuweisse", brauerei:"Ayinger Privatbrauerei", ort:"Aying",
+    stil:"Hefeweizen, hell", alkohol:"5,1 % ?", stammwuerze:"", ibu:"", farbe:"Bernstein, trüb",
+    alkoholfrei:false, bewertung:null, notiz:"" },
+
+  { datum:"2026-08-01", name:"Sebaldus Weizen Helles Hefe", brauerei:"Tucher Bräu", ort:"Fürth",
+    stil:"Hefeweizen, hell", alkohol:"5,2 % ?", stammwuerze:"", ibu:"", farbe:"Bernstein, trüb",
+    alkoholfrei:false, bewertung:null, notiz:"" }
+];
+</script>
+
+<style>
+:root{
+  --tisch:#241D17;
+  --tisch-hell:#33291F;
+  --filz:#EDE7D7;
+  --filz-tief:#DCD3BC;
+  --blau:#1E3E7B;
+  --rot:#A32B1C;
+  --kohle:#241D17;
+  --grau:#7A705E;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--tisch);
+  background-image:
+    repeating-linear-gradient(94deg, rgba(0,0,0,.16) 0 2px, rgba(255,255,255,.02) 2px 5px, rgba(0,0,0,0) 5px 26px);
+  color:var(--filz);
+  font-family:"Archivo",system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Anton",Impact,sans-serif;font-weight:400;letter-spacing:.01em;margin:0}
+a{color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+/* ---------- Kopf ---------- */
+.kopf{padding:56px 0 40px;text-align:center}
+.eyebrow{
+  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+  color:#B9AC8E;margin:0 0 18px;font-weight:600;
+}
+.kopf h1{
+  font-size:clamp(52px,13vw,116px);line-height:.88;text-transform:uppercase;
+  color:var(--filz);margin-bottom:6px;
+}
+.kopf .unter{
+  font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#B9AC8E;margin:0 0 34px;
+}
+.strich-buehne{margin:0 auto 26px;max-width:560px}
+.strich-buehne svg{width:100%;height:auto;display:block}
+.hero-stroke{
+  fill:none;stroke:#7FA7E8;stroke-width:7;stroke-linecap:round;
+}
+.kennzahlen{
+  list-style:none;display:flex;flex-wrap:wrap;justify-content:center;
+  gap:0;margin:0;padding:0;
+}
+.kennzahlen li{padding:0 22px;border-left:1px solid rgba(237,231,215,.18)}
+.kennzahlen li:first-child{border-left:0}
+.kennzahlen b{display:block;font-family:"Anton",sans-serif;font-size:34px;line-height:1;color:#E8C87A}
+.kennzahlen span{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#B9AC8E}
+
+/* ---------- Steuerung ---------- */
+.steuerung{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  padding:26px 0 22px;border-top:1px solid rgba(237,231,215,.14);margin-top:44px;
+}
+.knopfreihe{display:flex;flex-wrap:wrap;gap:8px}
+.knopf{
+  font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:#CFC4A9;background:transparent;border:1px solid rgba(237,231,215,.28);
+  padding:9px 15px;border-radius:2px;cursor:pointer;transition:.16s;
+}
+.knopf:hover{border-color:#E8C87A;color:#E8C87A}
+.knopf[aria-pressed="true"]{background:var(--filz);border-color:var(--filz);color:var(--tisch)}
+.knopf:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #E8C87A;outline-offset:3px}
+select{
+  font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:#CFC4A9;background:transparent;border:1px solid rgba(237,231,215,.28);
+  padding:9px 12px;border-radius:2px;
+}
+select option{background:var(--tisch-hell);color:var(--filz)}
+
+/* ---------- Bierdeckel ---------- */
+.deckel-feld{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
+  gap:26px;padding:14px 0 10px;
+}
+.deckel{
+  position:relative;background:var(--filz);color:var(--kohle);
+  border-radius:7px;padding:26px 22px 22px;
+  box-shadow:0 10px 22px rgba(0,0,0,.42), 0 1px 0 var(--filz-tief) inset;
+  transition:transform .22s ease, box-shadow .22s ease;
+}
+.deckel::before{
+  content:"";position:absolute;inset:9px;border:1.5px solid rgba(30,62,123,.45);
+  border-radius:3px;pointer-events:none;
+}
+.deckel:nth-child(3n+1){transform:rotate(-.7deg)}
+.deckel:nth-child(3n+2){transform:rotate(.5deg)}
+.deckel:nth-child(3n+3){transform:rotate(-.25deg)}
+.deckel:hover{transform:rotate(0deg) translateY(-6px);box-shadow:0 20px 34px rgba(0,0,0,.5)}
+.stempel{
+  position:absolute;top:16px;right:14px;transform:rotate(-4deg);
+  border:1.5px solid var(--rot);color:var(--rot);border-radius:2px;
+  font-size:10px;font-weight:700;letter-spacing:.1em;padding:3px 6px;
+}
+.brauerei{
+  font-size:10.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--blau);margin:6px 0 0;max-width:64%;
+}
+.deckel h3{font-size:26px;line-height:1.02;text-transform:uppercase;margin:8px 0 2px}
+.ort{font-size:12px;color:var(--grau);margin:0 0 16px}
+.daten{border-top:1.5px dotted rgba(36,29,23,.32);padding-top:11px;margin-top:4px}
+.zeile{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;padding:3.5px 0}
+.zeile dt{color:var(--grau);letter-spacing:.05em;flex:none}
+.zeile dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+.af{
+  display:inline-block;margin-top:14px;background:var(--blau);color:var(--filz);
+  font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  padding:4px 8px;border-radius:2px;
+}
+.bewertung{
+  margin-top:16px;padding-top:12px;border-top:1.5px dotted rgba(36,29,23,.32);
+  display:flex;align-items:center;gap:10px;min-height:34px;
+}
+.bewertung svg{height:22px;width:auto}
+.bewertung .note{font-family:"Anton",sans-serif;font-size:21px;color:var(--rot)}
+.bewertung .leer{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--grau)}
+.karten-strich{fill:none;stroke:var(--rot);stroke-width:2.4;stroke-linecap:round}
+.notiz{margin:12px 0 0;font-size:12.5px;font-style:italic;color:#4C4437}
+
+/* ---------- Abschnitte ---------- */
+.abschnitt{padding:52px 0 8px;border-top:1px solid rgba(237,231,215,.14);margin-top:46px}
+.abschnitt h2{font-size:clamp(26px,5vw,38px);text-transform:uppercase;margin-bottom:4px}
+.abschnitt .lead{font-size:13px;color:#B9AC8E;margin:0 0 26px;max-width:52ch}
+.leerzustand{
+  border:1.5px dashed rgba(237,231,215,.26);border-radius:4px;padding:26px;
+  font-size:14px;color:#CFC4A9;max-width:60ch;
+}
+.leerzustand code{background:rgba(237,231,215,.1);padding:2px 5px;border-radius:2px;font-size:12.5px}
+.rangliste{list-style:none;margin:0;padding:0;counter-reset:rang}
+.rangliste li{
+  display:flex;align-items:baseline;gap:14px;padding:13px 0;
+  border-bottom:1px solid rgba(237,231,215,.13);
+}
+.rangliste .platz{font-family:"Anton",sans-serif;font-size:22px;color:#E8C87A;min-width:38px}
+.rangliste .titel{flex:1;font-weight:600}
+.rangliste .titel small{display:block;font-weight:400;font-size:11.5px;color:#B9AC8E;letter-spacing:.06em;text-transform:uppercase}
+.rangliste .punkte{font-family:"Anton",sans-serif;font-size:22px;color:#E8C87A}
+.brauereien{list-style:none;margin:0;padding:0}
+.brauereien li{
+  display:flex;align-items:center;gap:16px;padding:13px 0;
+  border-bottom:1px solid rgba(237,231,215,.13);
+}
+.brauereien .bname{flex:1;font-weight:600}
+.brauereien .bname small{display:block;font-weight:400;font-size:11.5px;color:#B9AC8E}
+.brauereien svg{height:20px;width:auto;flex:none}
+.br-strich{fill:none;stroke:#E8C87A;stroke-width:2.4;stroke-linecap:round}
+.brauereien .anz{font-family:"Anton",sans-serif;font-size:19px;color:#E8C87A;min-width:26px;text-align:right}
+
+footer{padding:44px 0 60px;font-size:11.5px;color:#8C8067;line-height:1.75}
+footer .legende{border-top:1px solid rgba(237,231,215,.14);padding-top:20px}
+
+@media (max-width:560px){
+  .kennzahlen li{padding:0 14px}
+  .kennzahlen b{font-size:27px}
+  .deckel{padding:24px 18px 20px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<header class="kopf">
+  <div class="wrap">
+    <p class="eyebrow" id="zeitraum">Strichliste</p>
+    <h1>Bierdeckel</h1>
+    <p class="unter">Was im Glas war, und wann</p>
+    <div class="strich-buehne" id="heroStriche" aria-hidden="true"></div>
+    <ul class="kennzahlen">
+      <li><b id="kzBiere">0</b><span>Biere</span></li>
+      <li><b id="kzBrauereien">0</b><span>Brauereien</span></li>
+      <li><b id="kzAf">0</b><span>ohne Alkohol</span></li>
+      <li><b id="kzSchnitt">—</b><span>Ø Bewertung</span></li>
+    </ul>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="steuerung">
+    <div class="knopfreihe" role="group" aria-label="Biere filtern">
+      <button class="knopf" data-filter="alle" aria-pressed="true">Alle</button>
+      <button class="knopf" data-filter="alkohol" aria-pressed="false">Mit Alkohol</button>
+      <button class="knopf" data-filter="frei" aria-pressed="false">Ohne Alkohol</button>
+    </div>
+    <label>
+      <span class="visually-hidden"></span>
+      <select id="sortierung" aria-label="Sortierung">
+        <option value="neu">Neueste zuerst</option>
+        <option value="alt">Älteste zuerst</option>
+        <option value="note">Beste Bewertung</option>
+        <option value="name">Name A–Z</option>
+      </select>
+    </label>
+  </div>
+
+  <section id="deckelFeld" class="deckel-feld" aria-label="Getrunkene Biere"></section>
+
+  <section class="abschnitt">
+    <h2>Rangliste</h2>
+    <p class="lead">Sortiert nach eigener Bewertung, 1 bis 10.</p>
+    <div id="ranglisteBox"></div>
+  </section>
+
+  <section class="abschnitt">
+    <h2>Brauereien</h2>
+    <p class="lead">Ein Strich pro getrunkenem Bier.</p>
+    <ul class="brauereien" id="brauereiListe"></ul>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <p class="legende">
+    Technische Daten stammen vom Etikett oder von Herstellerangaben.
+    Ein <strong>?</strong> hinter einem Wert heißt: noch nicht am Etikett nachgeprüft.
+    Ein <strong>—</strong> heißt: Wert liegt noch nicht vor.<br>
+    Neues Bier eintragen: in <code>index.html</code> ganz oben ein Objekt an <code>BIERE</code> anhängen.
+  </p>
+</footer>
+
+<script>
+/* ---------- Strichliste zeichnen ---------- */
+function striche(anzahl, hoehe, luecke){
+  const gruppen = Math.ceil(anzahl/5) || 1;
+  const gBreite = 5*luecke + luecke*1.6;
+  const breite  = gruppen*gBreite;
+  const pfade = [];
+  let rest = anzahl, x = luecke;
+  for(let g=0; g<gruppen; g++){
+    const inGruppe = Math.min(5, rest); rest -= 5;
+    const voll = inGruppe === 5;
+    const senkrecht = voll ? 4 : inGruppe;
+    const startX = x;
+    for(let i=0;i<senkrecht;i++){
+      const px = x + i*luecke;
+      const neig = 2.5;
+      pfade.push(`M${px+neig} 3 L${px-neig} ${hoehe-3}`);
+    }
+    if(voll){
+      pfade.push(`M${startX-luecke*0.55} ${hoehe-5} L${startX+luecke*3.7} 5`);
+    }
+    x += gBreite;
+  }
+  return {breite, pfade};
+}
+function stricheSVG(anzahl, hoehe, luecke, klasse){
+  const {breite, pfade} = striche(anzahl, hoehe, luecke);
+  const d = pfade.map((p,i)=>`<path class="${klasse}" d="${p}" style="--i:${i}"/>`).join("");
+  return `<svg viewBox="0 0 ${breite} ${hoehe}" width="${breite}" height="${hoehe}"
+          preserveAspectRatio="xMidYMid meet" role="img">${d}</svg>`;
+}
+
+/* ---------- Helfer ---------- */
+const monate = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+function dLang(s){const d=new Date(s+"T12:00:00");return `${d.getDate()}. ${monate[d.getMonth()]} ${d.getFullYear()}`}
+function dKurz(s){const d=new Date(s+"T12:00:00");
+  return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getFullYear()).slice(2)}`}
+const w = v => (v && String(v).trim()) ? v : "—";
+
+/* ---------- Karten ---------- */
+function karte(b){
+  const note = (b.bewertung != null)
+    ? `${stricheSVG(b.bewertung, 22, 7, "karten-strich")}<span class="note">${b.bewertung}/10</span>`
+    : `<span class="leer">Noch nicht bewertet</span>`;
+  return `
+  <article class="deckel">
+    <span class="stempel">${dKurz(b.datum)}</span>
+    <p class="brauerei">${b.brauerei}</p>
+    <h3>${b.name}</h3>
+    <p class="ort">${w(b.ort)}</p>
+    <dl class="daten">
+      <div class="zeile"><dt>Stil</dt><dd>${w(b.stil)}</dd></div>
+      <div class="zeile"><dt>Alkohol</dt><dd>${w(b.alkohol)}</dd></div>
+      <div class="zeile"><dt>Stammwürze</dt><dd>${w(b.stammwuerze)}</dd></div>
+      <div class="zeile"><dt>Bittere</dt><dd>${w(b.ibu)}</dd></div>
+      <div class="zeile"><dt>Farbe</dt><dd>${w(b.farbe)}</dd></div>
+    </dl>
+    ${b.alkoholfrei ? '<span class="af">Ohne Alkohol</span>' : ''}
+    ${b.notiz ? `<p class="notiz">${b.notiz}</p>` : ''}
+    <div class="bewertung">${note}</div>
+  </article>`;
+}
+
+let filter = "alle";
+function zeichneFeld(){
+  const sort = document.getElementById("sortierung").value;
+  let liste = BIERE.filter(b =>
+    filter === "alle" ? true : filter === "frei" ? b.alkoholfrei : !b.alkoholfrei);
+
+  liste = liste.slice().sort((a,b)=>{
+    if(sort==="neu")  return a.datum < b.datum ? 1 : -1;
+    if(sort==="alt")  return a.datum > b.datum ? 1 : -1;
+    if(sort==="name") return (a.brauerei+a.name).localeCompare(b.brauerei+b.name,"de");
+    return (b.bewertung ?? -1) - (a.bewertung ?? -1);
+  });
+
+  const feld = document.getElementById("deckelFeld");
+  feld.innerHTML = liste.length
+    ? liste.map(karte).join("")
+    : `<p class="leerzustand">Kein Bier in dieser Auswahl. Filter wechseln oder ein neues Bier eintragen.</p>`;
+}
+
+/* ---------- Kennzahlen ---------- */
+function kennzahlen(){
+  const brauereien = new Set(BIERE.map(b=>b.brauerei));
+  const bewertet = BIERE.filter(b=>b.bewertung != null);
+  document.getElementById("kzBiere").textContent = BIERE.length;
+  document.getElementById("kzBrauereien").textContent = brauereien.size;
+  document.getElementById("kzAf").textContent = BIERE.filter(b=>b.alkoholfrei).length;
+  document.getElementById("kzSchnitt").textContent = bewertet.length
+    ? (bewertet.reduce((s,b)=>s+b.bewertung,0)/bewertet.length).toFixed(1).replace(".",",")
+    : "—";
+  const daten = BIERE.map(b=>b.datum).sort();
+  if(daten.length) document.getElementById("zeitraum").textContent = "Strichliste seit " + dLang(daten[0]);
+  document.getElementById("heroStriche").innerHTML = stricheSVG(BIERE.length, 78, 26, "hero-stroke");
+}
+
+/* ---------- Rangliste ---------- */
+function rangliste(){
+  const box = document.getElementById("ranglisteBox");
+  const bewertet = BIERE.filter(b=>b.bewertung != null).sort((a,b)=>b.bewertung-a.bewertung);
+  if(!bewertet.length){
+    box.innerHTML = `<div class="leerzustand">
+      Noch keine Bewertung eingetragen. Setz bei einem Bier <code>bewertung: 8</code>
+      statt <code>bewertung: null</code> — die Rangliste baut sich dann von selbst auf.</div>`;
+    return;
+  }
+  box.innerHTML = `<ol class="rangliste">` + bewertet.map((b,i)=>`
+    <li><span class="platz">${i+1}</span>
+      <span class="titel">${b.brauerei} ${b.name}<small>${w(b.stil)} · ${dKurz(b.datum)}</small></span>
+      <span class="punkte">${b.bewertung}</span></li>`).join("") + `</ol>`;
+}
+
+/* ---------- Brauereien ---------- */
+function brauereien(){
+  const zaehler = {};
+  BIERE.forEach(b=>{
+    zaehler[b.brauerei] = zaehler[b.brauerei] || {n:0, ort:b.ort};
+    zaehler[b.brauerei].n++;
+  });
+  document.getElementById("brauereiListe").innerHTML =
+    Object.entries(zaehler).sort((a,b)=>b[1].n-a[1].n || a[0].localeCompare(b[0],"de"))
+    .map(([name,d])=>`<li>
+        <span class="bname">${name}<small>${w(d.ort)}</small></span>
+        ${stricheSVG(d.n, 20, 7, "br-strich")}
+        <span class="anz">${d.n}</span></li>`).join("");
+}
+
+/* ---------- Start ---------- */
+document.querySelectorAll(".knopf[data-filter]").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    filter = btn.dataset.filter;
+    document.querySelectorAll(".knopf[data-filter]").forEach(o=>
+      o.setAttribute("aria-pressed", String(o === btn)));
+    zeichneFeld();
+  });
+});
+document.getElementById("sortierung").addEventListener("change", zeichneFeld);
+
+kennzahlen();
+zeichneFeld();
+rangliste();
+brauereien();
+
+/* Strichliste im Kopf zeichnet sich einmal ein */
+if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+  document.querySelectorAll("#heroStriche path").forEach((p,i)=>{
+    const l = p.getTotalLength();
+    p.style.strokeDasharray = l;
+    p.style.strokeDashoffset = l;
+    p.animate([{strokeDashoffset:l},{strokeDashoffset:0}],
+      {duration:260, delay:120 + i*95, fill:"forwards", easing:"cubic-bezier(.5,0,.2,1)"});
+  });
+}
+</script>
+</body>
+</html>
