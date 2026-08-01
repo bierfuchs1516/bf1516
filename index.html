@@ -7,222 +7,145 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- =====================================================================
-     HIER TRÄGST DU NEUE BIERE EIN.
-     Ein Bier = ein Objekt. Neues Bier einfach unten anhängen.
-
-     datum       "JJJJ-MM-TT"
-     bewertung   Zahl 1–10, oder null wenn noch nicht bewertet
-     alkoholfrei true / false
-     Ein "?" hinter einem Wert heißt: noch nicht am Etikett geprüft.
-     Feld leer lassen mit ""  ->  auf der Karte erscheint dann "—"
-     ===================================================================== -->
-<script>
-const BIERE = [
-  { datum:"2026-07-11", name:"Hell", brauerei:"Flötzinger Bräu", ort:"Rosenheim",
-    stil:"Helles", alkohol:"4,9 % ?", stammwuerze:"", ibu:"", farbe:"Goldgelb",
-    alkoholfrei:false, bewertung:null, notiz:"" },
-
-  { datum:"2026-07-18", name:"1543 Hefe-Weisse kellertrüb", brauerei:"Flötzinger Bräu", ort:"Rosenheim",
-    stil:"Hefeweizen, hell", alkohol:"5,4 % ?", stammwuerze:"", ibu:"", farbe:"Bernstein, trüb",
-    alkoholfrei:false, bewertung:null, notiz:"" },
-
-  { datum:"2026-07-19", name:"Hell", brauerei:"Herzogliches Brauhaus Tegernsee", ort:"Tegernsee",
-    stil:"Helles", alkohol:"4,8 %", stammwuerze:"11,7 % ?", ibu:"", farbe:"Hellgold",
-    alkoholfrei:false, bewertung:null, notiz:"" },
-
-  { datum:"2026-07-20", name:"Alkoholfrei Hell", brauerei:"Augustiner-Bräu", ort:"München",
-    stil:"Helles, alkoholfrei", alkohol:"< 0,5 %", stammwuerze:"", ibu:"", farbe:"Hellgold",
-    alkoholfrei:true, bewertung:null, notiz:"" },
-
-  { datum:"2026-07-24", name:"Kleiner Mönch", brauerei:"Alpirsbacher Klosterbräu", ort:"Alpirsbach",
-    stil:"Spezial / Vollbier", alkohol:"5,2 % ?", stammwuerze:"", ibu:"", farbe:"Goldgelb",
-    alkoholfrei:false, bewertung:null, notiz:"" },
-
-  { datum:"2026-07-26", name:"Spezial", brauerei:"Herzogliches Brauhaus Tegernsee", ort:"Tegernsee",
-    stil:"Export / Spezial", alkohol:"5,6 %", stammwuerze:"", ibu:"", farbe:"Kräftiges Gold",
-    alkoholfrei:false, bewertung:null, notiz:"" },
-
-  { datum:"2026-07-27", name:"Hell Alkoholfrei", brauerei:"Herzogliches Brauhaus Tegernsee", ort:"Tegernsee",
-    stil:"Helles, alkoholfrei", alkohol:"< 0,5 %", stammwuerze:"", ibu:"", farbe:"Hellgold",
-    alkoholfrei:true, bewertung:null, notiz:"" },
-
-  { datum:"2026-07-28", name:"Alkoholfrei Hell", brauerei:"Flötzinger Bräu", ort:"Rosenheim",
-    stil:"Helles, alkoholfrei", alkohol:"< 0,5 %", stammwuerze:"", ibu:"", farbe:"Hellgold",
-    alkoholfrei:true, bewertung:null, notiz:"" },
-
-  { datum:"2026-07-30", name:"Lagerbier Hell", brauerei:"Augustiner-Bräu", ort:"München",
-    stil:"Helles", alkohol:"5,2 %", stammwuerze:"11,8 % ?", ibu:"", farbe:"Hellgold",
-    alkoholfrei:false, bewertung:null, notiz:"" },
-
-  { datum:"2026-07-31", name:"0,0 % Herb", brauerei:"Bitburger", ort:"Bitburg",
-    stil:"Pils, alkoholfrei", alkohol:"0,0 %", stammwuerze:"", ibu:"", farbe:"Blassgold",
-    alkoholfrei:true, bewertung:null, notiz:"" },
-
-  { datum:"2026-07-31", name:"Bräuweisse", brauerei:"Ayinger Privatbrauerei", ort:"Aying",
-    stil:"Hefeweizen, hell", alkohol:"5,1 % ?", stammwuerze:"", ibu:"", farbe:"Bernstein, trüb",
-    alkoholfrei:false, bewertung:null, notiz:"" },
-
-  { datum:"2026-08-01", name:"Sebaldus Weizen Helles Hefe", brauerei:"Tucher Bräu", ort:"Fürth",
-    stil:"Hefeweizen, hell", alkohol:"5,2 % ?", stammwuerze:"", ibu:"", farbe:"Bernstein, trüb",
-    alkoholfrei:false, bewertung:null, notiz:"" }
-];
-</script>
-
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 :root{
-  --tisch:#241D17;
-  --tisch-hell:#33291F;
-  --filz:#EDE7D7;
-  --filz-tief:#DCD3BC;
-  --blau:#1E3E7B;
-  --rot:#A32B1C;
-  --kohle:#241D17;
-  --grau:#7A705E;
+  --tisch:#241D17; --tisch-hell:#33291F;
+  --filz:#EDE7D7; --filz-tief:#DCD3BC;
+  --blau:#1E3E7B; --rot:#A32B1C;
+  --kohle:#241D17; --grau:#7A705E; --gold:#E8C87A;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{
-  margin:0;
-  background:var(--tisch);
-  background-image:
-    repeating-linear-gradient(94deg, rgba(0,0,0,.16) 0 2px, rgba(255,255,255,.02) 2px 5px, rgba(0,0,0,0) 5px 26px);
-  color:var(--filz);
-  font-family:"Archivo",system-ui,sans-serif;
-  font-size:16px;
-  line-height:1.5;
+  margin:0;background:var(--tisch);
+  background-image:repeating-linear-gradient(94deg,rgba(0,0,0,.16) 0 2px,rgba(255,255,255,.02) 2px 5px,rgba(0,0,0,0) 5px 26px);
+  color:var(--filz);font-family:"Archivo",system-ui,sans-serif;font-size:16px;line-height:1.5;
   -webkit-font-smoothing:antialiased;
 }
-h1,h2,h3{font-family:"Anton",Impact,sans-serif;font-weight:400;letter-spacing:.01em;margin:0}
-a{color:inherit}
+h1,h2,h3{font-family:"Anton",Impact,sans-serif;font-weight:400;margin:0}
 .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
 
-/* ---------- Kopf ---------- */
+/* Kopf */
 .kopf{padding:56px 0 40px;text-align:center}
-.eyebrow{
-  font-size:11px;letter-spacing:.22em;text-transform:uppercase;
-  color:#B9AC8E;margin:0 0 18px;font-weight:600;
-}
-.kopf h1{
-  font-size:clamp(52px,13vw,116px);line-height:.88;text-transform:uppercase;
-  color:var(--filz);margin-bottom:6px;
-}
-.kopf .unter{
-  font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#B9AC8E;margin:0 0 34px;
-}
+.eyebrow{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#B9AC8E;margin:0 0 18px;font-weight:600}
+.kopf h1{font-size:clamp(52px,13vw,116px);line-height:.88;text-transform:uppercase;margin-bottom:6px}
+.kopf .unter{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:#B9AC8E;margin:0 0 34px}
 .strich-buehne{margin:0 auto 26px;max-width:560px}
 .strich-buehne svg{width:100%;height:auto;display:block}
-.hero-stroke{
-  fill:none;stroke:#7FA7E8;stroke-width:7;stroke-linecap:round;
-}
-.kennzahlen{
-  list-style:none;display:flex;flex-wrap:wrap;justify-content:center;
-  gap:0;margin:0;padding:0;
-}
+.hero-stroke{fill:none;stroke:#7FA7E8;stroke-width:7;stroke-linecap:round}
+.kennzahlen{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:0;margin:0;padding:0}
 .kennzahlen li{padding:0 22px;border-left:1px solid rgba(237,231,215,.18)}
 .kennzahlen li:first-child{border-left:0}
-.kennzahlen b{display:block;font-family:"Anton",sans-serif;font-size:34px;line-height:1;color:#E8C87A}
+.kennzahlen b{display:block;font-family:"Anton",sans-serif;font-size:34px;line-height:1;color:var(--gold)}
 .kennzahlen span{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#B9AC8E}
 
-/* ---------- Steuerung ---------- */
-.steuerung{
-  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
-  padding:26px 0 22px;border-top:1px solid rgba(237,231,215,.14);margin-top:44px;
-}
+/* Steuerung */
+.steuerung{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  padding:26px 0 22px;border-top:1px solid rgba(237,231,215,.14);margin-top:44px}
 .knopfreihe{display:flex;flex-wrap:wrap;gap:8px}
-.knopf{
-  font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+.knopf{font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
   color:#CFC4A9;background:transparent;border:1px solid rgba(237,231,215,.28);
-  padding:9px 15px;border-radius:2px;cursor:pointer;transition:.16s;
-}
-.knopf:hover{border-color:#E8C87A;color:#E8C87A}
+  padding:9px 15px;border-radius:2px;cursor:pointer;transition:.16s}
+.knopf:hover{border-color:var(--gold);color:var(--gold)}
 .knopf[aria-pressed="true"]{background:var(--filz);border-color:var(--filz);color:var(--tisch)}
-.knopf:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid #E8C87A;outline-offset:3px}
-select{
-  font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
-  color:#CFC4A9;background:transparent;border:1px solid rgba(237,231,215,.28);
-  padding:9px 12px;border-radius:2px;
-}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+select{font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:#CFC4A9;background:transparent;border:1px solid rgba(237,231,215,.28);padding:9px 12px;border-radius:2px}
 select option{background:var(--tisch-hell);color:var(--filz)}
 
-/* ---------- Bierdeckel ---------- */
-.deckel-feld{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));
-  gap:26px;padding:14px 0 10px;
-}
-.deckel{
-  position:relative;background:var(--filz);color:var(--kohle);
-  border-radius:7px;padding:26px 22px 22px;
-  box-shadow:0 10px 22px rgba(0,0,0,.42), 0 1px 0 var(--filz-tief) inset;
-  transition:transform .22s ease, box-shadow .22s ease;
-}
-.deckel::before{
-  content:"";position:absolute;inset:9px;border:1.5px solid rgba(30,62,123,.45);
-  border-radius:3px;pointer-events:none;
-}
+/* Bierdeckel */
+.deckel-feld{display:grid;grid-template-columns:repeat(auto-fill,minmax(282px,1fr));gap:26px;padding:14px 0 10px}
+.deckel{position:relative;background:var(--filz);color:var(--kohle);border-radius:7px;padding:22px 20px 20px;
+  box-shadow:0 10px 22px rgba(0,0,0,.42),0 1px 0 var(--filz-tief) inset;transition:transform .22s ease,box-shadow .22s ease}
+.deckel::before{content:"";position:absolute;inset:9px;border:1.5px solid rgba(30,62,123,.45);border-radius:3px;pointer-events:none}
 .deckel:nth-child(3n+1){transform:rotate(-.7deg)}
 .deckel:nth-child(3n+2){transform:rotate(.5deg)}
 .deckel:nth-child(3n+3){transform:rotate(-.25deg)}
-.deckel:hover{transform:rotate(0deg) translateY(-6px);box-shadow:0 20px 34px rgba(0,0,0,.5)}
-.stempel{
-  position:absolute;top:16px;right:14px;transform:rotate(-4deg);
-  border:1.5px solid var(--rot);color:var(--rot);border-radius:2px;
-  font-size:10px;font-weight:700;letter-spacing:.1em;padding:3px 6px;
-}
-.brauerei{
-  font-size:10.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
-  color:var(--blau);margin:6px 0 0;max-width:64%;
-}
-.deckel h3{font-size:26px;line-height:1.02;text-transform:uppercase;margin:8px 0 2px}
-.ort{font-size:12px;color:var(--grau);margin:0 0 16px}
-.daten{border-top:1.5px dotted rgba(36,29,23,.32);padding-top:11px;margin-top:4px}
+.deckel:hover,.deckel:focus-within{transform:rotate(0) translateY(-6px);box-shadow:0 20px 34px rgba(0,0,0,.5)}
+.stempel{position:absolute;top:14px;right:13px;transform:rotate(-4deg);border:1.5px solid var(--rot);
+  color:var(--rot);border-radius:2px;font-size:10px;font-weight:700;letter-spacing:.1em;padding:3px 6px}
+.deckel-kopf{display:flex;gap:13px;align-items:flex-start;padding-right:52px}
+.logo{width:46px;height:46px;flex:none;border-radius:50%;overflow:hidden;
+  border:1.5px solid rgba(30,62,123,.5);display:grid;place-items:center;background:#fff}
+.logo img{width:100%;height:100%;object-fit:contain;padding:4px}
+.logo .mono{font-family:"Anton",sans-serif;font-size:16px;color:var(--blau);letter-spacing:.02em}
+.brauerei{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blau);margin:2px 0 0}
+.deckel h3{font-size:24px;line-height:1.02;text-transform:uppercase;margin:5px 0 2px}
+.ort{font-size:12px;color:var(--grau);margin:0}
+.daten{border-top:1.5px dotted rgba(36,29,23,.32);padding-top:11px;margin:16px 0 0}
 .zeile{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;padding:3.5px 0}
-.zeile dt{color:var(--grau);letter-spacing:.05em;flex:none}
+.zeile dt{color:var(--grau);flex:none}
 .zeile dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
-.af{
-  display:inline-block;margin-top:14px;background:var(--blau);color:var(--filz);
-  font-size:9.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
-  padding:4px 8px;border-radius:2px;
-}
-.bewertung{
-  margin-top:16px;padding-top:12px;border-top:1.5px dotted rgba(36,29,23,.32);
-  display:flex;align-items:center;gap:10px;min-height:34px;
-}
-.bewertung svg{height:22px;width:auto}
-.bewertung .note{font-family:"Anton",sans-serif;font-size:21px;color:var(--rot)}
-.bewertung .leer{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--grau)}
-.karten-strich{fill:none;stroke:var(--rot);stroke-width:2.4;stroke-linecap:round}
+.af{display:inline-block;margin-top:13px;background:var(--blau);color:var(--filz);font-size:9.5px;
+  font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;border-radius:2px}
 .notiz{margin:12px 0 0;font-size:12.5px;font-style:italic;color:#4C4437}
 
-/* ---------- Abschnitte ---------- */
+/* Bewertung */
+.note-block{margin-top:15px;padding-top:12px;border-top:1.5px dotted rgba(36,29,23,.32)}
+.note-kopf{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.note-label{font-size:9.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--grau)}
+.note-wert{font-family:"Anton",sans-serif;font-size:19px;color:var(--rot);line-height:1}
+.note-wert.leer{font-family:"Archivo",sans-serif;font-size:11px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--grau)}
+.note-skala{display:flex;gap:3px}
+.note-skala button{flex:1;height:24px;padding:0;cursor:pointer;background:transparent;
+  border:1.2px solid rgba(30,62,123,.4);border-radius:2px;font:600 10px "Archivo",sans-serif;
+  color:rgba(36,29,23,.45);transition:.12s}
+.note-skala button:hover{border-color:var(--rot);color:var(--rot)}
+.note-skala button.an{background:var(--rot);border-color:var(--rot);color:var(--filz)}
+.note-loeschen{margin-top:7px;background:none;border:0;padding:0;cursor:pointer;
+  font:600 10px "Archivo",sans-serif;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--grau);text-decoration:underline;text-underline-offset:3px}
+.note-loeschen:hover{color:var(--rot)}
+
+/* Abschnitte */
 .abschnitt{padding:52px 0 8px;border-top:1px solid rgba(237,231,215,.14);margin-top:46px}
 .abschnitt h2{font-size:clamp(26px,5vw,38px);text-transform:uppercase;margin-bottom:4px}
-.abschnitt .lead{font-size:13px;color:#B9AC8E;margin:0 0 26px;max-width:52ch}
-.leerzustand{
-  border:1.5px dashed rgba(237,231,215,.26);border-radius:4px;padding:26px;
-  font-size:14px;color:#CFC4A9;max-width:60ch;
-}
+.abschnitt .lead{font-size:13px;color:#B9AC8E;margin:0 0 26px;max-width:56ch}
+.leerzustand{border:1.5px dashed rgba(237,231,215,.26);border-radius:4px;padding:26px;font-size:14px;color:#CFC4A9;max-width:62ch}
 .leerzustand code{background:rgba(237,231,215,.1);padding:2px 5px;border-radius:2px;font-size:12.5px}
-.rangliste{list-style:none;margin:0;padding:0;counter-reset:rang}
-.rangliste li{
-  display:flex;align-items:baseline;gap:14px;padding:13px 0;
-  border-bottom:1px solid rgba(237,231,215,.13);
-}
-.rangliste .platz{font-family:"Anton",sans-serif;font-size:22px;color:#E8C87A;min-width:38px}
+.rangliste{list-style:none;margin:0;padding:0}
+.rangliste li{display:flex;align-items:baseline;gap:14px;padding:13px 0;border-bottom:1px solid rgba(237,231,215,.13)}
+.rangliste .platz{font-family:"Anton",sans-serif;font-size:22px;color:var(--gold);min-width:38px}
 .rangliste .titel{flex:1;font-weight:600}
 .rangliste .titel small{display:block;font-weight:400;font-size:11.5px;color:#B9AC8E;letter-spacing:.06em;text-transform:uppercase}
-.rangliste .punkte{font-family:"Anton",sans-serif;font-size:22px;color:#E8C87A}
+.rangliste .punkte{font-family:"Anton",sans-serif;font-size:22px;color:var(--gold)}
 .brauereien{list-style:none;margin:0;padding:0}
-.brauereien li{
-  display:flex;align-items:center;gap:16px;padding:13px 0;
-  border-bottom:1px solid rgba(237,231,215,.13);
-}
+.brauereien li{display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid rgba(237,231,215,.13)}
 .brauereien .bname{flex:1;font-weight:600}
 .brauereien .bname small{display:block;font-weight:400;font-size:11.5px;color:#B9AC8E}
 .brauereien svg{height:20px;width:auto;flex:none}
-.br-strich{fill:none;stroke:#E8C87A;stroke-width:2.4;stroke-linecap:round}
-.brauereien .anz{font-family:"Anton",sans-serif;font-size:19px;color:#E8C87A;min-width:26px;text-align:right}
+.br-strich{fill:none;stroke:var(--gold);stroke-width:2.4;stroke-linecap:round}
+.brauereien .anz{font-family:"Anton",sans-serif;font-size:19px;color:var(--gold);min-width:26px;text-align:right}
+
+/* Karte */
+#karte{height:min(64vh,520px);border-radius:4px;background:var(--tisch-hell);
+  border:1px solid rgba(237,231,215,.18);overflow:hidden}
+#karte .leaflet-tile-pane{filter:sepia(.4) saturate(.65) brightness(.86) contrast(1.06)}
+.leaflet-container{background:#1B1610;font-family:"Archivo",sans-serif}
+.pin{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;
+  background:var(--rot);color:var(--filz);border:2px solid var(--filz);
+  font-family:"Anton",sans-serif;font-size:15px;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+.leaflet-popup-content-wrapper{background:var(--filz);color:var(--kohle);border-radius:5px}
+.leaflet-popup-tip{background:var(--filz)}
+.leaflet-popup-content{margin:14px 16px;font-size:13px;line-height:1.45}
+.pop-name{font-family:"Anton",sans-serif;font-size:17px;text-transform:uppercase;line-height:1.05;margin:0}
+.pop-ort{font-size:11.5px;color:var(--grau);margin:2px 0 9px}
+.pop-liste{list-style:none;margin:0;padding:9px 0 0;border-top:1.5px dotted rgba(36,29,23,.3)}
+.pop-liste li{display:flex;justify-content:space-between;gap:12px;padding:2px 0;font-size:12.5px}
+.pop-liste span{color:var(--grau);font-variant-numeric:tabular-nums}
+
+/* Speicherleiste */
+.speicherleiste{position:sticky;bottom:0;z-index:900;background:var(--gold);color:var(--tisch);
+  display:none;align-items:center;gap:14px;flex-wrap:wrap;padding:13px 20px;
+  box-shadow:0 -6px 20px rgba(0,0,0,.45)}
+.speicherleiste.zeigen{display:flex}
+.speicherleiste p{margin:0;flex:1;font-size:13px;font-weight:500;min-width:210px}
+.speicherleiste button{font:700 11px "Archivo",sans-serif;letter-spacing:.13em;text-transform:uppercase;
+  padding:10px 16px;border-radius:2px;cursor:pointer;border:1.5px solid var(--tisch)}
+.sp-laden{background:var(--tisch);color:var(--gold)}
+.sp-verwerfen{background:transparent;color:var(--tisch)}
 
 footer{padding:44px 0 60px;font-size:11.5px;color:#8C8067;line-height:1.75}
 footer .legende{border-top:1px solid rgba(237,231,215,.14);padding-top:20px}
@@ -230,12 +153,9 @@ footer .legende{border-top:1px solid rgba(237,231,215,.14);padding-top:20px}
 @media (max-width:560px){
   .kennzahlen li{padding:0 14px}
   .kennzahlen b{font-size:27px}
-  .deckel{padding:24px 18px 20px}
+  .note-skala button{height:28px}
 }
-@media (prefers-reduced-motion:reduce){
-  *{animation:none !important;transition:none !important}
-  html{scroll-behavior:auto}
-}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
 <body>
@@ -256,22 +176,18 @@ footer .legende{border-top:1px solid rgba(237,231,215,.14);padding-top:20px}
 </header>
 
 <main class="wrap">
-
   <div class="steuerung">
     <div class="knopfreihe" role="group" aria-label="Biere filtern">
       <button class="knopf" data-filter="alle" aria-pressed="true">Alle</button>
       <button class="knopf" data-filter="alkohol" aria-pressed="false">Mit Alkohol</button>
       <button class="knopf" data-filter="frei" aria-pressed="false">Ohne Alkohol</button>
     </div>
-    <label>
-      <span class="visually-hidden"></span>
-      <select id="sortierung" aria-label="Sortierung">
-        <option value="neu">Neueste zuerst</option>
-        <option value="alt">Älteste zuerst</option>
-        <option value="note">Beste Bewertung</option>
-        <option value="name">Name A–Z</option>
-      </select>
-    </label>
+    <select id="sortierung" aria-label="Sortierung">
+      <option value="neu">Neueste zuerst</option>
+      <option value="alt">Älteste zuerst</option>
+      <option value="note">Beste Bewertung</option>
+      <option value="name">Name A–Z</option>
+    </select>
   </div>
 
   <section id="deckelFeld" class="deckel-feld" aria-label="Getrunkene Biere"></section>
@@ -283,72 +199,109 @@ footer .legende{border-top:1px solid rgba(237,231,215,.14);padding-top:20px}
   </section>
 
   <section class="abschnitt">
+    <h2>Karte</h2>
+    <p class="lead">Jede Brauerei, bei der schon etwas im Glas war. Die Zahl im Pin ist die Anzahl Biere. Tippen für Details.</p>
+    <div id="karte" role="region" aria-label="Karte der Brauereien"></div>
+  </section>
+
+  <section class="abschnitt">
     <h2>Brauereien</h2>
     <p class="lead">Ein Strich pro getrunkenem Bier.</p>
     <ul class="brauereien" id="brauereiListe"></ul>
   </section>
-
 </main>
+
+<div class="speicherleiste" id="speicherleiste" role="status">
+  <p id="speicherText"></p>
+  <button class="sp-laden" id="btnExport">biere.js herunterladen</button>
+  <button class="sp-verwerfen" id="btnVerwerfen">Verwerfen</button>
+</div>
 
 <footer class="wrap">
   <p class="legende">
     Technische Daten stammen vom Etikett oder von Herstellerangaben.
-    Ein <strong>?</strong> hinter einem Wert heißt: noch nicht am Etikett nachgeprüft.
-    Ein <strong>—</strong> heißt: Wert liegt noch nicht vor.<br>
-    Neues Bier eintragen: in <code>index.html</code> ganz oben ein Objekt an <code>BIERE</code> anhängen.
+    <strong>?</strong> heißt: noch nicht am Etikett nachgeprüft. <strong>—</strong> heißt: Wert liegt noch nicht vor.
+    Koordinaten zeigen die Ortsmitte, nicht die Werksadresse.<br>
+    Daten stehen in <code>biere.js</code>. Kartendaten © OpenStreetMap-Mitwirkende.
   </p>
 </footer>
 
+<script src="biere.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-/* ---------- Strichliste zeichnen ---------- */
-function striche(anzahl, hoehe, luecke){
-  const gruppen = Math.ceil(anzahl/5) || 1;
-  const gBreite = 5*luecke + luecke*1.6;
-  const breite  = gruppen*gBreite;
-  const pfade = [];
-  let rest = anzahl, x = luecke;
-  for(let g=0; g<gruppen; g++){
-    const inGruppe = Math.min(5, rest); rest -= 5;
-    const voll = inGruppe === 5;
-    const senkrecht = voll ? 4 : inGruppe;
-    const startX = x;
-    for(let i=0;i<senkrecht;i++){
-      const px = x + i*luecke;
-      const neig = 2.5;
-      pfade.push(`M${px+neig} 3 L${px-neig} ${hoehe-3}`);
-    }
-    if(voll){
-      pfade.push(`M${startX-luecke*0.55} ${hoehe-5} L${startX+luecke*3.7} 5`);
-    }
-    x += gBreite;
+/* ---------- Strichliste ---------- */
+function striche(anzahl,hoehe,luecke){
+  const gruppen=Math.ceil(anzahl/5)||1, gBreite=5*luecke+luecke*1.6, breite=gruppen*gBreite;
+  const pfade=[]; let rest=anzahl, x=luecke;
+  for(let g=0;g<gruppen;g++){
+    const inG=Math.min(5,rest); rest-=5;
+    const voll=inG===5, senkrecht=voll?4:inG, startX=x;
+    for(let i=0;i<senkrecht;i++){const px=x+i*luecke; pfade.push(`M${px+2.5} 3 L${px-2.5} ${hoehe-3}`);}
+    if(voll) pfade.push(`M${startX-luecke*.55} ${hoehe-5} L${startX+luecke*3.7} 5`);
+    x+=gBreite;
   }
-  return {breite, pfade};
+  return {breite,pfade};
 }
-function stricheSVG(anzahl, hoehe, luecke, klasse){
-  const {breite, pfade} = striche(anzahl, hoehe, luecke);
-  const d = pfade.map((p,i)=>`<path class="${klasse}" d="${p}" style="--i:${i}"/>`).join("");
+function stricheSVG(anzahl,hoehe,luecke,klasse){
+  const {breite,pfade}=striche(anzahl,hoehe,luecke);
   return `<svg viewBox="0 0 ${breite} ${hoehe}" width="${breite}" height="${hoehe}"
-          preserveAspectRatio="xMidYMid meet" role="img">${d}</svg>`;
+    preserveAspectRatio="xMidYMid meet" role="img">${
+    pfade.map(p=>`<path class="${klasse}" d="${p}"/>`).join("")}</svg>`;
 }
 
 /* ---------- Helfer ---------- */
-const monate = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
-function dLang(s){const d=new Date(s+"T12:00:00");return `${d.getDate()}. ${monate[d.getMonth()]} ${d.getFullYear()}`}
-function dKurz(s){const d=new Date(s+"T12:00:00");
-  return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getFullYear()).slice(2)}`}
-const w = v => (v && String(v).trim()) ? v : "—";
+const monate=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const dLang=s=>{const d=new Date(s+"T12:00:00");return `${d.getDate()}. ${monate[d.getMonth()]} ${d.getFullYear()}`};
+const dKurz=s=>{const d=new Date(s+"T12:00:00");
+  return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getFullYear()).slice(2)}`};
+const w=v=>(v&&String(v).trim())?v:"—";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const br=n=>BRAUEREIEN[n]||{ort:"",lat:null,lon:null,logo:""};
+const id=b=>`${b.datum}|${b.brauerei}|${b.name}`;
+const mono=n=>n.replace(/[^A-Za-zÄÖÜäöüß ]/g," ").trim().split(/\s+/)
+  .filter(x=>!/^(bräu|brauerei|privatbrauerei|klosterbräu|brauhaus|herzogliches)$/i.test(x))
+  .slice(0,2).map(x=>x[0].toUpperCase()).join("")||n.slice(0,2).toUpperCase();
+
+/* ---------- Bewertungen: Datei + Browser ---------- */
+const KEY="bierdeckel.bewertungen";
+let lokal={};
+try{ lokal=JSON.parse(localStorage.getItem(KEY)||"{}"); }catch(e){ lokal={}; }
+const note=b=>Object.prototype.hasOwnProperty.call(lokal,id(b))?lokal[id(b)]:b.bewertung;
+function setzeNote(bid,wert){
+  const b=BIERE.find(x=>id(x)===bid); if(!b) return;
+  lokal[bid]=wert;
+  if(lokal[bid]===b.bewertung) delete lokal[bid];
+  try{ localStorage.setItem(KEY,JSON.stringify(lokal)); }catch(e){}
+  zeichneFeld(); kennzahlen(); rangliste(); leiste();
+}
+function leiste(){
+  const n=Object.keys(lokal).length, bar=document.getElementById("speicherleiste");
+  bar.classList.toggle("zeigen",n>0);
+  document.getElementById("speicherText").textContent =
+    `${n} ${n===1?"Bewertung ist":"Bewertungen sind"} nur in diesem Browser gespeichert. Datei laden und in GitHub hochladen, damit sie überall gilt.`;
+}
 
 /* ---------- Karten ---------- */
 function karte(b){
-  const note = (b.bewertung != null)
-    ? `${stricheSVG(b.bewertung, 22, 7, "karten-strich")}<span class="note">${b.bewertung}/10</span>`
-    : `<span class="leer">Noch nicht bewertet</span>`;
+  const B=br(b.brauerei), n=note(b);
+  const logo=B.logo
+    ? `<img src="${esc(B.logo)}" alt="Logo ${esc(b.brauerei)}" loading="lazy"
+         onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'mono',textContent:'${mono(b.brauerei)}'}))">`
+    : `<span class="mono">${mono(b.brauerei)}</span>`;
+  const skala=Array.from({length:10},(_,i)=>
+    `<button type="button" data-id="${esc(id(b))}" data-note="${i+1}"
+       class="${n!=null&&i<n?"an":""}" aria-label="${i+1} von 10">${i+1}</button>`).join("");
   return `
   <article class="deckel">
     <span class="stempel">${dKurz(b.datum)}</span>
-    <p class="brauerei">${b.brauerei}</p>
-    <h3>${b.name}</h3>
-    <p class="ort">${w(b.ort)}</p>
+    <div class="deckel-kopf">
+      <span class="logo">${logo}</span>
+      <div>
+        <p class="brauerei">${esc(b.brauerei)}</p>
+        <h3>${esc(b.name)}</h3>
+        <p class="ort">${w(B.ort)}</p>
+      </div>
+    </div>
     <dl class="daten">
       <div class="zeile"><dt>Stil</dt><dd>${w(b.stil)}</dd></div>
       <div class="zeile"><dt>Alkohol</dt><dd>${w(b.alkohol)}</dd></div>
@@ -356,101 +309,153 @@ function karte(b){
       <div class="zeile"><dt>Bittere</dt><dd>${w(b.ibu)}</dd></div>
       <div class="zeile"><dt>Farbe</dt><dd>${w(b.farbe)}</dd></div>
     </dl>
-    ${b.alkoholfrei ? '<span class="af">Ohne Alkohol</span>' : ''}
-    ${b.notiz ? `<p class="notiz">${b.notiz}</p>` : ''}
-    <div class="bewertung">${note}</div>
+    ${b.alkoholfrei?'<span class="af">Ohne Alkohol</span>':''}
+    ${b.notiz?`<p class="notiz">${esc(b.notiz)}</p>`:''}
+    <div class="note-block">
+      <div class="note-kopf">
+        <span class="note-label">Bewertung</span>
+        <span class="note-wert ${n==null?"leer":""}">${n==null?"noch offen":n+"/10"}</span>
+      </div>
+      <div class="note-skala">${skala}</div>
+      ${n!=null?`<button type="button" class="note-loeschen" data-id="${esc(id(b))}">Bewertung entfernen</button>`:""}
+    </div>
   </article>`;
 }
 
-let filter = "alle";
+let filter="alle";
 function zeichneFeld(){
-  const sort = document.getElementById("sortierung").value;
-  let liste = BIERE.filter(b =>
-    filter === "alle" ? true : filter === "frei" ? b.alkoholfrei : !b.alkoholfrei);
-
-  liste = liste.slice().sort((a,b)=>{
-    if(sort==="neu")  return a.datum < b.datum ? 1 : -1;
-    if(sort==="alt")  return a.datum > b.datum ? 1 : -1;
+  const sort=document.getElementById("sortierung").value;
+  let liste=BIERE.filter(b=>filter==="alle"?true:filter==="frei"?b.alkoholfrei:!b.alkoholfrei);
+  liste=liste.slice().sort((a,b)=>{
+    if(sort==="neu") return a.datum<b.datum?1:-1;
+    if(sort==="alt") return a.datum>b.datum?1:-1;
     if(sort==="name") return (a.brauerei+a.name).localeCompare(b.brauerei+b.name,"de");
-    return (b.bewertung ?? -1) - (a.bewertung ?? -1);
+    return (note(b)??-1)-(note(a)??-1);
   });
-
-  const feld = document.getElementById("deckelFeld");
-  feld.innerHTML = liste.length
+  document.getElementById("deckelFeld").innerHTML = liste.length
     ? liste.map(karte).join("")
-    : `<p class="leerzustand">Kein Bier in dieser Auswahl. Filter wechseln oder ein neues Bier eintragen.</p>`;
+    : `<p class="leerzustand">Kein Bier in dieser Auswahl. Filter wechseln oder ein Bier in <code>biere.js</code> eintragen.</p>`;
 }
 
 /* ---------- Kennzahlen ---------- */
 function kennzahlen(){
-  const brauereien = new Set(BIERE.map(b=>b.brauerei));
-  const bewertet = BIERE.filter(b=>b.bewertung != null);
-  document.getElementById("kzBiere").textContent = BIERE.length;
-  document.getElementById("kzBrauereien").textContent = brauereien.size;
-  document.getElementById("kzAf").textContent = BIERE.filter(b=>b.alkoholfrei).length;
-  document.getElementById("kzSchnitt").textContent = bewertet.length
-    ? (bewertet.reduce((s,b)=>s+b.bewertung,0)/bewertet.length).toFixed(1).replace(".",",")
-    : "—";
-  const daten = BIERE.map(b=>b.datum).sort();
-  if(daten.length) document.getElementById("zeitraum").textContent = "Strichliste seit " + dLang(daten[0]);
-  document.getElementById("heroStriche").innerHTML = stricheSVG(BIERE.length, 78, 26, "hero-stroke");
+  const bewertet=BIERE.filter(b=>note(b)!=null);
+  document.getElementById("kzBiere").textContent=BIERE.length;
+  document.getElementById("kzBrauereien").textContent=new Set(BIERE.map(b=>b.brauerei)).size;
+  document.getElementById("kzAf").textContent=BIERE.filter(b=>b.alkoholfrei).length;
+  document.getElementById("kzSchnitt").textContent=bewertet.length
+    ? (bewertet.reduce((s,b)=>s+note(b),0)/bewertet.length).toFixed(1).replace(".",",") : "—";
+  const daten=BIERE.map(b=>b.datum).sort();
+  if(daten.length) document.getElementById("zeitraum").textContent="Strichliste seit "+dLang(daten[0]);
+  document.getElementById("heroStriche").innerHTML=stricheSVG(BIERE.length,78,26,"hero-stroke");
 }
 
 /* ---------- Rangliste ---------- */
 function rangliste(){
-  const box = document.getElementById("ranglisteBox");
-  const bewertet = BIERE.filter(b=>b.bewertung != null).sort((a,b)=>b.bewertung-a.bewertung);
-  if(!bewertet.length){
-    box.innerHTML = `<div class="leerzustand">
-      Noch keine Bewertung eingetragen. Setz bei einem Bier <code>bewertung: 8</code>
-      statt <code>bewertung: null</code> — die Rangliste baut sich dann von selbst auf.</div>`;
+  const box=document.getElementById("ranglisteBox");
+  const l=BIERE.filter(b=>note(b)!=null).sort((a,b)=>note(b)-note(a));
+  box.innerHTML = l.length
+    ? `<ol class="rangliste">`+l.map((b,i)=>`<li><span class="platz">${i+1}</span>
+        <span class="titel">${esc(b.brauerei)} ${esc(b.name)}<small>${w(b.stil)} · ${dKurz(b.datum)}</small></span>
+        <span class="punkte">${note(b)}</span></li>`).join("")+`</ol>`
+    : `<div class="leerzustand">Noch keine Bewertung. Tipp auf einer Bierkarte unten auf eine Zahl von 1 bis 10 — die Rangliste baut sich dann von selbst auf.</div>`;
+}
+
+/* ---------- Brauereiliste ---------- */
+function zaehlung(){
+  const z={};
+  BIERE.forEach(b=>{ (z[b.brauerei]=z[b.brauerei]||{n:0,biere:[]}); z[b.brauerei].n++; z[b.brauerei].biere.push(b); });
+  return z;
+}
+function brauereiliste(){
+  document.getElementById("brauereiListe").innerHTML=
+    Object.entries(zaehlung()).sort((a,b)=>b[1].n-a[1].n||a[0].localeCompare(b[0],"de"))
+    .map(([name,d])=>`<li><span class="bname">${esc(name)}<small>${w(br(name).ort)}</small></span>
+      ${stricheSVG(d.n,20,7,"br-strich")}<span class="anz">${d.n}</span></li>`).join("");
+}
+
+/* ---------- Karte ---------- */
+function zeichneKarte(){
+  const el=document.getElementById("karte");
+  if(typeof L==="undefined"){
+    el.outerHTML=`<div class="leerzustand">Die Karte konnte nicht geladen werden. Sie braucht eine Internetverbindung.</div>`;
     return;
   }
-  box.innerHTML = `<ol class="rangliste">` + bewertet.map((b,i)=>`
-    <li><span class="platz">${i+1}</span>
-      <span class="titel">${b.brauerei} ${b.name}<small>${w(b.stil)} · ${dKurz(b.datum)}</small></span>
-      <span class="punkte">${b.bewertung}</span></li>`).join("") + `</ol>`;
+  const map=L.map(el,{scrollWheelZoom:false});
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
+    maxZoom:17, attribution:'&copy; OpenStreetMap'}).addTo(map);
+  map.on("click",()=>map.scrollWheelZoom.enable());
+
+  const punkte=[];
+  Object.entries(zaehlung()).forEach(([name,d])=>{
+    const B=br(name); if(B.lat==null) return;
+    punkte.push([B.lat,B.lon]);
+    L.marker([B.lat,B.lon],{
+      icon:L.divIcon({className:"",html:`<span class="pin">${d.n}</span>`,iconSize:[32,32],iconAnchor:[16,16]}),
+      title:name
+    }).addTo(map).bindPopup(
+      `<p class="pop-name">${esc(name)}</p><p class="pop-ort">${w(B.ort)}</p>
+       <ul class="pop-liste">${d.biere.slice().sort((a,b)=>a.datum<b.datum?1:-1)
+         .map(b=>`<li>${esc(b.name)}<span>${dKurz(b.datum)}</span></li>`).join("")}</ul>`);
+  });
+  punkte.length
+    ? map.fitBounds(L.latLngBounds(punkte).pad(.28),{maxZoom:8})
+    : map.setView([51.1,10.4],5.4);
 }
 
-/* ---------- Brauereien ---------- */
-function brauereien(){
-  const zaehler = {};
-  BIERE.forEach(b=>{
-    zaehler[b.brauerei] = zaehler[b.brauerei] || {n:0, ort:b.ort};
-    zaehler[b.brauerei].n++;
-  });
-  document.getElementById("brauereiListe").innerHTML =
-    Object.entries(zaehler).sort((a,b)=>b[1].n-a[1].n || a[0].localeCompare(b[0],"de"))
-    .map(([name,d])=>`<li>
-        <span class="bname">${name}<small>${w(d.ort)}</small></span>
-        ${stricheSVG(d.n, 20, 7, "br-strich")}
-        <span class="anz">${d.n}</span></li>`).join("");
+/* ---------- Export ---------- */
+function dateiInhalt(){
+  const kopf=`/* =====================================================================
+   BIERDECKEL — Datenbank
+   Diese Datei wird von index.html geladen. Nur hier stehen Daten.
+   Zuletzt aus der Website exportiert: ${new Date().toLocaleString("de-DE")}
+   ===================================================================== */\n\n`;
+  const brs="const BRAUEREIEN = {\n"+Object.entries(BRAUEREIEN).map(([n,d])=>
+    `  ${JSON.stringify(n)}: { ort:${JSON.stringify(d.ort)}, lat:${d.lat}, lon:${d.lon}, logo:${JSON.stringify(d.logo||"")} }`
+  ).join(",\n")+"\n};\n\n";
+  const bs="const BIERE = [\n"+BIERE.map(b=>
+    `  { datum:${JSON.stringify(b.datum)}, name:${JSON.stringify(b.name)}, brauerei:${JSON.stringify(b.brauerei)},\n`+
+    `    stil:${JSON.stringify(b.stil||"")}, alkohol:${JSON.stringify(b.alkohol||"")}, stammwuerze:${JSON.stringify(b.stammwuerze||"")}, `+
+    `ibu:${JSON.stringify(b.ibu||"")}, farbe:${JSON.stringify(b.farbe||"")},\n`+
+    `    alkoholfrei:${!!b.alkoholfrei}, bewertung:${note(b)==null?"null":note(b)}, notiz:${JSON.stringify(b.notiz||"")} }`
+  ).join(",\n\n")+"\n];\n";
+  return kopf+brs+bs;
 }
+document.getElementById("btnExport").addEventListener("click",()=>{
+  const url=URL.createObjectURL(new Blob([dateiInhalt()],{type:"text/javascript;charset=utf-8"}));
+  const a=document.createElement("a"); a.href=url; a.download="biere.js"; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+});
+document.getElementById("btnVerwerfen").addEventListener("click",()=>{
+  if(!confirm("Alle Bewertungen verwerfen, die noch nicht in biere.js stehen?")) return;
+  lokal={}; try{localStorage.removeItem(KEY);}catch(e){}
+  zeichneFeld(); kennzahlen(); rangliste(); leiste();
+});
 
 /* ---------- Start ---------- */
+document.getElementById("deckelFeld").addEventListener("click",e=>{
+  const s=e.target.closest(".note-skala button");
+  if(s){ setzeNote(s.dataset.id, Number(s.dataset.note)); return; }
+  const l=e.target.closest(".note-loeschen");
+  if(l) setzeNote(l.dataset.id, null);
+});
 document.querySelectorAll(".knopf[data-filter]").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    filter = btn.dataset.filter;
-    document.querySelectorAll(".knopf[data-filter]").forEach(o=>
-      o.setAttribute("aria-pressed", String(o === btn)));
+  btn.addEventListener("click",()=>{
+    filter=btn.dataset.filter;
+    document.querySelectorAll(".knopf[data-filter]").forEach(o=>o.setAttribute("aria-pressed",String(o===btn)));
     zeichneFeld();
   });
 });
-document.getElementById("sortierung").addEventListener("change", zeichneFeld);
+document.getElementById("sortierung").addEventListener("change",zeichneFeld);
 
-kennzahlen();
-zeichneFeld();
-rangliste();
-brauereien();
+kennzahlen(); zeichneFeld(); rangliste(); brauereiliste(); zeichneKarte(); leiste();
 
-/* Strichliste im Kopf zeichnet sich einmal ein */
 if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
   document.querySelectorAll("#heroStriche path").forEach((p,i)=>{
-    const l = p.getTotalLength();
-    p.style.strokeDasharray = l;
-    p.style.strokeDashoffset = l;
-    p.animate([{strokeDashoffset:l},{strokeDashoffset:0}],
-      {duration:260, delay:120 + i*95, fill:"forwards", easing:"cubic-bezier(.5,0,.2,1)"});
+    const len=p.getTotalLength();
+    p.style.strokeDasharray=len; p.style.strokeDashoffset=len;
+    p.animate([{strokeDashoffset:len},{strokeDashoffset:0}],
+      {duration:260,delay:120+i*95,fill:"forwards",easing:"cubic-bezier(.5,0,.2,1)"});
   });
 }
 </script>
